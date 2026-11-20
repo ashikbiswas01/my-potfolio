@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ashik Biswas — Computer Science & Technology student, Python developer, and creator of JARVIS AI Assistant and interactive 3D web experiences." />
+  <meta name="theme-color" content="#04060e" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ashik Biswas — Code, Games & The Cosmos" />
+  <meta property="og:description" content="Explore my projects, skills, journey, and interactive 3D portfolio." />
+  <meta property="og:image" content="ashik-profile.jpg" />
+  <title>Ashik Biswas — Code, Games & The Cosmos</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 for crisp social & UI icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js r128 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cosmos: {
+              950: '#04060e',
+              900: '#080c1a',
+              800: '#0f172a',
+              cyan: '#38bdf8',
+              indigo: '#818cf8',
+              purple: '#c084fc',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Base Cosmic Dark Theme & Glassmorphism Utilities */
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: #04060e;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* Fixed 3D WebGL Background Container */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: auto;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      outline: none;
+    }
+
+    /* Allow smooth scrolling over canvas while letting pointer drag interact */
+    .content-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .interactive-card,
+    a,
+    button,
+    input,
+    .pointer-auto {
+      pointer-events: auto;
+    }
+
+    /* Glassmorphic Card Styles */
+    .glass-panel {
+      background: rgba(10, 15, 30, 0.58);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 24px 60px rgba(14, 165, 233, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .glass-nav {
+      background: rgba(5, 8, 18, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Subtle Gradient Text */
+    .text-gradient-cosmic {
+      background: linear-gradient(135deg, #ffffff 10%, #7dd3fc 50%, #c084fc 95%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-cyan {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Scroll Reveal Animations */
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal-up.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #04060e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.25);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.5);
+    }
+
+    /* Pulse indicator */
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      70% { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 9999px;
+      border: 1.5px solid #38bdf8;
+      animation: pulseRing 2s infinite;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- Fixed 3D Three.js Cosmic Canvas -->
+  <div id="canvas-container" aria-hidden="true"></div>
+
+  <!-- Toast Notification Box (Replaces any alert usage) -->
+  <div id="toast-box" class="fixed bottom-20 right-5 z-50 hidden transform transition-all duration-300 translate-y-3 opacity-0 pointer-events-none">
+    <div class="glass-panel rounded-xl px-4 py-3 flex items-center gap-3 border-sky-400/40">
+      <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+      <span id="toast-message" class="text-xs sm:text-sm font-medium text-slate-100">Notification</span>
+    </div>
+  </div>
+
+  <!-- Fixed Glassmorphic Navigation Bar -->
+  <header class="fixed top-0 inset-x-0 z-40 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        <!-- Brand Logo -->
+        <a href="#hero" class="flex items-center gap-3 group">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-sky-400/50 shadow-lg shadow-sky-500/20 group-hover:border-sky-400 transition">
+            <img src="ashik-profile.jpg" alt="Ashik Biswas" class="w-full h-full object-cover object-top" />
+          </div>
+          <div class="flex flex-col">
+            <span class="font-bold text-white tracking-tight text-sm sm:text-base leading-none">Ashik Biswas</span>
+            <span class="text-[11px] font-mono text-sky-400/80 mt-0.5">CST // JPI-BD</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1 lg:gap-2" aria-label="Main Navigation">
+          <a href="#about" data-nav="about" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">01. About</a>
+          <a href="#passions" data-nav="passions" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">02. Passions</a>
+          <a href="#skills" data-nav="skills" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">03. Stack</a>
+          <a href="#projects" data-nav="projects" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">04. Projects</a>
+          <a href="#journey" data-nav="journey" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">05. Journey</a>
+          <a href="#contact" data-nav="contact" class="nav-link px-3.5 py-2 rounded-xl text-xs lg:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">06. Contact</a>
+        </nav>
+
+        <!-- Right CTA & Mobile Menu Toggle -->
+        <div class="flex items-center gap-2.5">
+          <a href="https://wa.me/8801931443324" data-platform="whatsapp" target="_blank" rel="noopener noreferrer"
+             class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-400/30 hover:bg-sky-500/25 hover:border-sky-400/60 transition">
+            <i class="fa-brands fa-whatsapp text-emerald-400 text-sm"></i>
+            <span>Connect</span>
+          </a>
+
+          <button id="mobile-menu-btn" type="button" aria-label="Open menu"
+                  class="md:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 transition">
+            <i id="mobile-menu-icon" class="fa-solid fa-bars text-base"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-drawer" class="hidden md:hidden border-t border-white/10 bg-[#050814]/95 backdrop-blur-2xl px-4 pt-3 pb-6 space-y-1.5">
+      <a href="#about" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">01. About &amp; Education</a>
+      <a href="#passions" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">02. What I Love</a>
+      <a href="#skills" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">03. Tools &amp; Technologies</a>
+      <a href="#projects" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">04. Projects &amp; JARVIS HUD</a>
+      <a href="#journey" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">05. Experience &amp; Future Goals</a>
+      <a href="#contact" class="mobile-nav-item block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-sky-500/15 hover:text-sky-300 transition">06. Contact</a>
+    </div>
+  </header>
+
+  <!-- Floating Interactive 3D Scene Control Pill -->
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-auto max-w-[95vw]">
+    <div class="glass-panel rounded-full px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-2 sm:gap-3 border-white/15 shadow-2xl">
+      <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-slate-400 pr-2 border-r border-white/10">
+        <i class="fa-solid fa-cube text-sky-400"></i>
+        <span>Drag 3D Space</span>
+      </span>
+
+      <button id="btn-toggle-orbit" type="button"
+              class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-sky-500/20 text-sky-300 border border-sky-400/30 hover:bg-sky-500/30 transition flex items-center gap-1.5"
+              title="Toggle Auto-Rotation">
+        <i id="icon-orbit" class="fa-solid fa-rotate"></i>
+        <span id="label-orbit">Orbit: ON</span>
+      </button>
+
+      <button id="btn-camera-focus" type="button"
+              class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/5 text-slate-200 border border-white/10 hover:bg-white/15 transition flex items-center gap-1.5"
+              title="Inspect MacBook Pro 3D Model">
+        <i class="fa-solid fa-laptop-code text-purple-400"></i>
+        <span id="label-focus">MacBook HUD</span>
+      </button>
+
+      <button id="btn-galaxy-boost" type="button"
+              class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/5 text-slate-200 border border-white/10 hover:bg-white/15 transition flex items-center gap-1.5"
+              title="Hyperdrive Galaxy Warp">
+        <i class="fa-solid fa-sparkles text-amber-400"></i>
+        <span id="label-boost">Warp</span>
+      </button>
+
+      <button id="btn-wireframe" type="button"
+              class="hidden sm:flex px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/5 text-slate-200 border border-white/10 hover:bg-white/15 transition items-center gap-1.5"
+              title="Toggle Structural Wireframe">
+        <i class="fa-solid fa-vector-square text-emerald-400"></i>
+        <span>Mesh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Scrollable Foreground Content -->
+  <main class="content-layer">
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="min-h-screen flex items-center pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center w-full">
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6">
+          <!-- Eyebrow Badge -->
+          <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-panel border-sky-400/30">
+            <span class="relative flex h-2.5 w-2.5 pulse-ring">
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-400"></span>
+            </span>
+            <span class="text-xs sm:text-sm font-medium text-sky-200 tracking-wide">
+              Computer Science &amp; Technology student, Bangladesh
+            </span>
+          </div>
+
+          <!-- Bold Hero Typography -->
+          <h1 class="text-4xl sm:text-6xl lg:text-[4.15rem] font-extrabold tracking-tight leading-[1.08]">
+            <span class="text-white block">Ashik Biswas —</span>
+            <span class="text-gradient-cosmic block mt-1">Code, games and the cosmos.</span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-slate-300/90 max-w-2xl leading-relaxed font-normal">
+            Building intelligent desktop assistants, interactive 3D web experiences, and Python-powered software systems from <span class="text-white font-medium">Jashore Polytechnic Institute</span>. Passionate about voice AI, game engines, and exploring the mathematics of the universe.
+          </p>
+
+          <!-- Primary & Secondary CTA Buttons -->
+          <div class="flex flex-wrap items-center gap-3.5 pt-2">
+            <a href="#projects"
+               class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-sm font-semibold text-slate-950 bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 hover:brightness-110 shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5">
+              <span>See my projects</span>
+              <i class="fa-solid fa-arrow-down-right text-xs"></i>
+            </a>
+
+            <a href="https://wa.me/8801931443324?text=Hello%20Ashik!%20I%20visited%20your%203D%20portfolio%20website."
+               data-platform="whatsapp" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-sm font-semibold text-white glass-panel hover:bg-white/10 border-white/15 transition transform hover:-translate-y-0.5">
+              <i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>
+              <span>WhatsApp me</span>
+            </a>
+          </div>
+
+          <!-- Comprehensive Social Media Links Row -->
+          <div class="pt-4 space-y-2.5">
+            <span class="text-xs font-mono uppercase tracking-wider text-slate-400 block">
+              Social Handles (<span class="text-sky-300">@ashikbiswas01</span> &bull; IG/TT/YT: <span class="text-pink-300">@ashik_biswas01</span>):
+            </span>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <a href="https://facebook.com/ashikbiswas01" data-platform="facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook (@ashikbiswas01)" title="Facebook (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-blue-400 hover:border-blue-400/50 hover:shadow-[0_0_18px_rgba(96,165,250,0.28)] transition">
+                <i class="fa-brands fa-facebook-f text-base"></i>
+              </a>
+
+              <a href="https://instagram.com/ashik_biswas01" data-platform="instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram (@ashik_biswas01)" title="Instagram (@ashik_biswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-pink-400 hover:border-pink-400/50 hover:shadow-[0_0_18px_rgba(244,114,182,0.28)] transition">
+                <i class="fa-brands fa-instagram text-lg"></i>
+              </a>
+
+              <a href="https://x.com/ashikbiswas01" data-platform="x" target="_blank" rel="noopener noreferrer" aria-label="X (@ashikbiswas01)" title="X (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-white hover:border-slate-300/60 hover:shadow-[0_0_18px_rgba(255,255,255,0.22)] transition">
+                <i class="fa-brands fa-x-twitter text-base"></i>
+              </a>
+
+              <a href="https://linkedin.com/in/ashikbiswas01" data-platform="linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (@ashikbiswas01)" title="LinkedIn (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-sky-400 hover:border-sky-400/50 hover:shadow-[0_0_18px_rgba(56,189,248,0.28)] transition">
+                <i class="fa-brands fa-linkedin-in text-base"></i>
+              </a>
+
+              <a href="https://github.com/ashikbiswas01" data-platform="github" target="_blank" rel="noopener noreferrer" aria-label="GitHub (@ashikbiswas01)" title="GitHub (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-white hover:border-purple-400/50 hover:shadow-[0_0_18px_rgba(192,132,252,0.28)] transition">
+                <i class="fa-brands fa-github text-lg"></i>
+              </a>
+
+              <a href="https://youtube.com/@ashik_biswas01" data-platform="youtube" target="_blank" rel="noopener noreferrer" aria-label="YouTube (@ashik_biswas01)" title="YouTube (@ashik_biswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-rose-500 hover:border-rose-500/50 hover:shadow-[0_0_18px_rgba(244,63,94,0.28)] transition">
+                <i class="fa-brands fa-youtube text-lg"></i>
+              </a>
+
+              <a href="https://wa.me/8801931443324" data-platform="whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp (+880 1931443324)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-emerald-400 hover:border-emerald-400/50 hover:shadow-[0_0_18px_rgba(52,211,153,0.28)] transition">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+              </a>
+
+              <a href="https://t.me/ashikbiswas01" data-platform="telegram" target="_blank" rel="noopener noreferrer" aria-label="Telegram (@ashikbiswas01)" title="Telegram (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-400/50 hover:shadow-[0_0_18px_rgba(34,211,238,0.28)] transition">
+                <i class="fa-brands fa-telegram text-lg"></i>
+              </a>
+
+              <a href="https://tiktok.com/@ashik_biswas01" data-platform="tiktok" target="_blank" rel="noopener noreferrer" aria-label="TikTok (@ashik_biswas01)" title="TikTok (@ashik_biswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-fuchsia-400 hover:border-fuchsia-400/50 hover:shadow-[0_0_18px_rgba(232,121,249,0.28)] transition">
+                <i class="fa-brands fa-tiktok text-base"></i>
+              </a>
+
+              <a href="https://discord.com/users/ashikbiswas01" data-platform="discord" target="_blank" rel="noopener noreferrer" aria-label="Discord (@ashikbiswas01)" title="Discord (@ashikbiswas01)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-400/50 hover:shadow-[0_0_18px_rgba(129,140,248,0.28)] transition">
+                <i class="fa-brands fa-discord text-base"></i>
+              </a>
+
+              <a href="mailto:ashikbiswas011@gmail.com" data-platform="email" aria-label="Email" title="Email (ashikbiswas011@gmail.com)"
+                 class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-300 hover:text-amber-300 hover:border-amber-400/50 hover:shadow-[0_0_18px_rgba(251,191,36,0.28)] transition">
+                <i class="fa-solid fa-envelope text-base"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Spacer / Interactive Telemetry Badge over 3D MacBook -->
+        <div class="lg:col-span-5 flex flex-col items-start lg:items-end justify-end min-h-[260px] sm:min-h-[340px]">
+          <div class="glass-panel rounded-2xl p-4 sm:p-5 max-w-xs w-full border-sky-400/25 interactive-card">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="font-mono text-xs font-semibold text-sky-300">JARVIS_CORE // LIVE</span>
+              </div>
+              <span class="font-mono text-[10px] text-slate-400">3D VIEWPORT</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed mb-3">
+              Move your mouse or drag anywhere in deep space to orbit the procedural MacBook Pro &amp; spiral galaxy.
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+              <div class="bg-white/5 rounded-lg px-2.5 py-1.5 border border-white/5">
+                <span class="text-slate-400 block text-[10px]">STARS</span>
+                <span class="text-sky-300 font-semibold">4,500+</span>
+              </div>
+              <div class="bg-white/5 rounded-lg px-2.5 py-1.5 border border-white/5">
+                <span class="text-slate-400 block text-[10px]">HUD STATUS</span>
+                <span class="text-emerald-400 font-semibold">ONLINE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01: ABOUT & EDUCATION -->
+    <section id="about" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 01</span>
+          <div class="h-px w-12 bg-sky-400/40"></div>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-10">
+          About &amp; <span class="text-gradient-cyan">Education</span>
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <!-- Developer Identity Card with Real Photo -->
+          <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 flex flex-col justify-between interactive-card relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-sky-500/15 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
+
+            <div>
+              <!-- Circular Cosmic Portrait Frame with Ashik's Photo -->
+              <div class="relative w-36 h-36 sm:w-44 sm:h-44 mx-auto mb-6 group">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-sky-400 via-indigo-500 to-purple-500 opacity-85 blur-[2px] animate-spin" style="animation-duration: 12s;"></div>
+                <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-sky-400 via-indigo-500 to-purple-500 animate-spin" style="animation-duration: 14s;"></div>
+                <div class="relative w-full h-full p-1 rounded-full bg-[#070b18] overflow-hidden">
+                  <img
+                    src="ashik-profile.jpg"
+                    alt="Ashik Biswas"
+                    onerror="this.onerror=null; this.src='https://placehold.co/400x400/0f172a/38bdf8?text=Ashik+Biswas';"
+                    class="w-full h-full rounded-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+              </div>
+
+              <div class="text-center">
+                <h3 class="text-xl sm:text-2xl font-bold text-white">Ashik Biswas</h3>
+                <p class="text-sm font-mono text-sky-400 mt-1">@ashikbiswas01</p>
+                <p class="text-xs font-mono text-pink-300/90 mt-0.5">IG / TT / YT: @ashik_biswas01</p>
+                <p class="text-xs sm:text-sm text-slate-400 mt-3 leading-relaxed">
+                  Jashore, Khulna Division, Bangladesh
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-5 border-t border-white/10 grid grid-cols-3 gap-2 text-center">
+              <div class="p-2 rounded-xl bg-white/5">
+                <span class="block font-mono text-sm sm:text-base font-bold text-white">4th</span>
+                <span class="text-[11px] text-slate-400">Semester</span>
+              </div>
+              <div class="p-2 rounded-xl bg-white/5">
+                <span class="block font-mono text-sm sm:text-base font-bold text-sky-400">CST</span>
+                <span class="text-[11px] text-slate-400">Department</span>
+              </div>
+              <div class="p-2 rounded-xl bg-white/5">
+                <span class="block font-mono text-sm sm:text-base font-bold text-purple-400">24–25</span>
+                <span class="text-[11px] text-slate-400">Session</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bio & Academic Credential Card -->
+          <div class="lg:col-span-7 flex flex-col gap-6">
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 interactive-card">
+              <h3 class="text-lg sm:text-xl font-semibold text-white mb-3 flex items-center gap-2.5">
+                <i class="fa-solid fa-terminal text-sky-400"></i>
+                <span>Who I Am</span>
+              </h3>
+              <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-4">
+                I am a curious Computer Science &amp; Technology student who treats code as both an engineering craft and a creative playground. Whether architecting an event-driven voice assistant in Python or rendering spiral galaxies in WebGL, I love turning ambitious concepts into responsive, living software.
+              </p>
+              <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                My current focus lies at the intersection of <span class="text-sky-300 font-medium">AI speech interfaces</span>, <span class="text-purple-300 font-medium">desktop automation</span>, and <span class="text-indigo-300 font-medium">interactive web graphics</span>.
+              </p>
+            </div>
+
+            <!-- Academic Card -->
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 interactive-card border-l-4 border-l-sky-400">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                  <span class="inline-block px-3 py-1 rounded-full text-xs font-mono font-medium bg-sky-500/15 text-sky-300 border border-sky-400/30 mb-2">
+                    Academic Credentials
+                  </span>
+                  <h3 class="text-lg sm:text-xl font-bold text-white">
+                    Diploma in Engineering — Computer Science &amp; Technology
+                  </h3>
+                  <p class="text-sm sm:text-base text-slate-300 mt-1">
+                    Jashore Polytechnic Institute (JPI)
+                  </p>
+                </div>
+                <div class="text-left sm:text-right">
+                  <span class="block font-mono text-xs text-slate-400">BOARD</span>
+                  <span class="text-xs sm:text-sm font-medium text-slate-200">Bangladesh Technical Education Board (BTEB)</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-2.5 pt-2">
+                <span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-sky-300">
+                  <i class="fa-regular fa-calendar mr-1.5"></i>Session: 2024–2025
+                </span>
+                <span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-purple-300">
+                  <i class="fa-solid fa-layer-group mr-1.5"></i>4th Semester
+                </span>
+                <span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-emerald-300">
+                  <i class="fa-solid fa-location-dot mr-1.5"></i>Jashore, Bangladesh
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: WHAT I LOVE -->
+    <section id="passions" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 02</span>
+          <div class="h-px w-12 bg-sky-400/40"></div>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
+          What I <span class="text-gradient-cosmic">Love</span>
+        </h2>
+        <p class="text-slate-400 max-w-2xl text-sm sm:text-base mb-10">
+          Four core pillars that fuel my curiosity every single day—from silicon logic gates to cosmic horizons.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Card 1: Computers -->
+          <div class="glass-panel rounded-3xl p-6 interactive-card group hover:-translate-y-1.5">
+            <div class="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400 text-xl mb-5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-microchip"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Computers</h3>
+            <p class="text-sm text-slate-300/90 leading-relaxed">
+              Low-level systems, operating internals, clean software architecture, and automating repetitive workflows with Python and PowerShell.
+            </p>
+          </div>
+
+          <!-- Card 2: Games -->
+          <div class="glass-panel rounded-3xl p-6 interactive-card group hover:-translate-y-1.5">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-purple-400 text-xl mb-5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Games</h3>
+            <p class="text-sm text-slate-300/90 leading-relaxed">
+              Interactive worlds, game physics loops with Pygame, responsive HUD interfaces, and the art of turning code into playable experiences.
+            </p>
+          </div>
+
+          <!-- Card 3: Multiverse -->
+          <div class="glass-panel rounded-3xl p-6 interactive-card group hover:-translate-y-1.5">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center text-indigo-400 text-xl mb-5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-atom"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Multiverse</h3>
+            <p class="text-sm text-slate-300/90 leading-relaxed">
+              Parallel possibilities, sci-fi world-building, quantum mechanics thought experiments, and speculative futures of human-AI synergy.
+            </p>
+          </div>
+
+          <!-- Card 4: Universe -->
+          <div class="glass-panel rounded-3xl p-6 interactive-card group hover:-translate-y-1.5">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-amber-400 text-xl mb-5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-meteor"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Universe</h3>
+            <p class="text-sm text-slate-300/90 leading-relaxed">
+              Deep-space astronomy, spiral galaxies, black holes, orbital mechanics, and visualizing celestial beauty through real-time 3D shaders.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: TOOLS & TECHNOLOGIES -->
+    <section id="skills" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 03</span>
+          <div class="h-px w-12 bg-sky-400/40"></div>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
+          Tools &amp; <span class="text-gradient-cyan">Technologies</span>
+        </h2>
+        <p class="text-slate-400 max-w-2xl text-sm sm:text-base mb-10">
+          Languages, frameworks, and AI speech engines I use to build desktop applications, interactive web interfaces, and voice assistants.
+        </p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Category 1: Programming & Web -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-sky-400">
+                    <i class="fa-solid fa-code"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-white">Programming &amp; Web</h3>
+                </div>
+                <span class="font-mono text-xs text-sky-400">01</span>
+              </div>
+
+              <div class="space-y-5">
+                <!-- Python -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200 flex items-center gap-2"><i class="fa-brands fa-python text-sky-400"></i> Python</span>
+                    <span class="font-mono text-sky-400">92%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-1000" style="width: 0%" data-width="92%"></div>
+                  </div>
+                </div>
+
+                <!-- HTML & CSS -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200 flex items-center gap-2"><i class="fa-brands fa-html5 text-orange-400"></i> HTML &amp; CSS</span>
+                    <span class="font-mono text-sky-400">88%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-1000" style="width: 0%" data-width="88%"></div>
+                  </div>
+                </div>
+
+                <!-- JavaScript -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200 flex items-center gap-2"><i class="fa-brands fa-js text-amber-400"></i> JavaScript (ES6+ / Three.js)</span>
+                    <span class="font-mono text-sky-400">82%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-1000" style="width: 0%" data-width="82%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">AsyncIO</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">Tailwind CSS</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">WebGL</span>
+            </div>
+          </div>
+
+          <!-- Category 2: Desktop & Data -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-purple-400">
+                    <i class="fa-solid fa-desktop"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-white">Desktop &amp; Data</h3>
+                </div>
+                <span class="font-mono text-xs text-purple-400">02</span>
+              </div>
+
+              <div class="space-y-5">
+                <!-- PySide6 -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">PySide6 (Qt for Python)</span>
+                    <span class="font-mono text-purple-400">86%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-1000" style="width: 0%" data-width="86%"></div>
+                  </div>
+                </div>
+
+                <!-- SQLite -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">SQLite</span>
+                    <span class="font-mono text-purple-400">84%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-1000" style="width: 0%" data-width="84%"></div>
+                  </div>
+                </div>
+
+                <!-- Pygame & PowerShell -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">Pygame &amp; PowerShell</span>
+                    <span class="font-mono text-purple-400">80%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-purple-400 to-pink-400 transition-all duration-1000" style="width: 0%" data-width="80%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">PySide6</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">SQLite3</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">Pygame</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">PowerShell</span>
+            </div>
+          </div>
+
+          <!-- Category 3: AI & Speech -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-wave-square"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-white">AI &amp; Speech</h3>
+                </div>
+                <span class="font-mono text-xs text-emerald-400">03</span>
+              </div>
+
+              <div class="space-y-5">
+                <!-- LLM APIs & Ollama -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">LLM APIs &amp; Ollama</span>
+                    <span class="font-mono text-emerald-400">90%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-1000" style="width: 0%" data-width="90%"></div>
+                  </div>
+                </div>
+
+                <!-- Edge TTS -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">Edge TTS (Neural Voices)</span>
+                    <span class="font-mono text-emerald-400">89%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-1000" style="width: 0%" data-width="89%"></div>
+                  </div>
+                </div>
+
+                <!-- Speech Recognition -->
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm font-medium mb-1.5">
+                    <span class="text-slate-200">Speech Recognition</span>
+                    <span class="font-mono text-emerald-400">87%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div class="skill-bar h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-1000" style="width: 0%" data-width="87%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">Ollama Local</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">Edge-TTS</span>
+              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-slate-300">Bangla / English NLP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: PROJECTS & EXPERIMENTS -->
+    <section id="projects" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 04</span>
+          <div class="h-px w-12 bg-sky-400/40"></div>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
+          Projects &amp; <span class="text-gradient-cosmic">Experiments</span>
+        </h2>
+        <p class="text-slate-400 max-w-2xl text-sm sm:text-base mb-10">
+          Featured software builds, voice-driven desktop intelligence, and interactive 3D experiments.
+        </p>
+
+        <!-- FLAGSHIP PROJECT: JARVIS AI ASSISTANT -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 mb-8 border-sky-400/35 relative overflow-hidden interactive-card">
+          <div class="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <!-- Flagship Description -->
+            <div class="lg:col-span-7 space-y-5">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/35 text-sky-300 text-xs font-mono font-semibold">
+                <i class="fa-solid fa-star text-amber-400"></i>
+                <span>FLAGSHIP PROJECT</span>
+              </div>
+
+              <h3 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+                JARVIS AI Assistant
+              </h3>
+
+              <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                A next-generation voice-controlled PC assistant engineered in Python with a <span class="text-sky-300 font-medium">modular event-driven architecture</span>. Built for natural multilingual interaction across <span class="text-white font-semibold">Bangla, Banglish, and English</span>—seamlessly executing OS automation, conversational LLM reasoning via Ollama/APIs, and neural speech synthesis.
+              </p>
+
+              <!-- Architecture Highlights -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                  <span class="font-mono text-xs text-sky-400 block mb-1">01 // MULTILINGUAL</span>
+                  <span class="text-xs text-slate-200 font-medium">Bangla, Banglish &amp; English Voice Pipeline</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                  <span class="font-mono text-xs text-purple-400 block mb-1">02 // EVENT BUS</span>
+                  <span class="text-xs text-slate-200 font-medium">Decoupled Modular Plugin Architecture</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10">
+                  <span class="font-mono text-xs text-emerald-400 block mb-1">03 // HYBRID AI</span>
+                  <span class="text-xs text-slate-200 font-medium">Local Ollama + Cloud LLM &amp; Edge TTS</span>
+                </div>
+              </div>
+
+              <!-- Tech Stack Tags -->
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="px-3 py-1 rounded-full text-xs font-mono bg-sky-500/10 text-sky-300 border border-sky-400/20">Python</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono bg-purple-500/10 text-purple-300 border border-purple-400/20">PySide6 HUD</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-400/20">Edge TTS</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-400/20">Ollama &amp; LLMs</span>
+                <span class="px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-300 border border-amber-400/20">SQLite Memory</span>
+              </div>
+            </div>
+
+            <!-- Interactive Live JARVIS HUD Telemetry Simulator -->
+            <div class="lg:col-span-5">
+              <div class="rounded-2xl bg-[#050914]/90 border border-sky-400/30 p-5 shadow-2xl font-mono">
+                <!-- HUD Header -->
+                <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span class="text-xs text-sky-300 font-semibold ml-1">JARVIS_HUD_v2.4</span>
+                  </div>
+                  <span id="hud-lang-badge" class="px-2 py-0.5 rounded text-[10px] bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                    LANG: BANGLISH
+                  </span>
+                </div>
+
+                <!-- Live Telemetry Meters -->
+                <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="text-[10px] text-slate-400 block">EVENT BUS</span>
+                    <span class="text-xs text-emerald-400 font-bold">ACTIVE</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="text-[10px] text-slate-400 block">LATENCY</span>
+                    <span id="hud-latency" class="text-xs text-sky-300 font-bold">142 ms</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-white/5 border border-white/5">
+                    <span class="text-[10px] text-slate-400 block">VOICE ENGINE</span>
+                    <span class="text-xs text-purple-300 font-bold">EDGE-TTS</span>
+                  </div>
+                </div>
+
+                <!-- Interactive Terminal Output -->
+                <div id="jarvis-terminal" class="h-36 overflow-y-auto rounded-xl bg-black/50 border border-white/10 p-3 text-xs space-y-2 mb-4">
+                  <div class="text-slate-400">[SYSTEM] Event loop initialized. Listening for wake word...</div>
+                  <div class="text-sky-300">&gt; User: "Jarvis, system status dekhao"</div>
+                  <div class="text-emerald-300">[JARVIS]: CPU nominal at 18%. All modules synced, Ashik.</div>
+                </div>
+
+                <!-- Interactive Voice Command Simulator Buttons -->
+                <div class="space-y-2">
+                  <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Test Multilingual Command:</span>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="simulateJarvisCommand('bangla')"
+                            class="px-2.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/30 text-[11px] text-sky-200 transition">
+                      বাংলা (Bangla)
+                    </button>
+                    <button type="button" onclick="simulateJarvisCommand('banglish')"
+                            class="px-2.5 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/30 text-[11px] text-purple-200 transition">
+                      Banglish
+                    </button>
+                    <button type="button" onclick="simulateJarvisCommand('english')"
+                            class="px-2.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/30 text-[11px] text-emerald-200 transition">
+                      English
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Projects Grid (3 Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Project 2: 3D MacBook Portfolio -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between group hover:-translate-y-1.5">
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center text-indigo-400 text-lg">
+                  <i class="fa-solid fa-cube"></i>
+                </div>
+                <span class="font-mono text-xs text-slate-400">Three.js // WebGL</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2.5 group-hover:text-sky-300 transition">
+                3D MacBook Portfolio
+              </h3>
+              <p class="text-sm text-slate-300/90 leading-relaxed mb-5">
+                An interactive cosmic portfolio featuring a procedural 3D MacBook Pro with an animated canvas HUD screen, multi-layered spiral starfield, and scroll-choreographed camera kinematics.
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/10">
+              <div class="flex gap-1.5">
+                <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-indigo-300">Three.js</span>
+                <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-sky-300">Tailwind</span>
+              </div>
+              <button type="button" onclick="focusMacBookFromCard()" class="text-xs font-mono text-sky-400 hover:text-sky-300 flex items-center gap-1">
+                <span>Inspect 3D</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Project 3: Desktop Automation -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between group hover:-translate-y-1.5">
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 text-lg">
+                  <i class="fa-solid fa-gears"></i>
+                </div>
+                <span class="font-mono text-xs text-slate-400">Python // PowerShell</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2.5 group-hover:text-emerald-300 transition">
+                Desktop Automation
+              </h3>
+              <p class="text-sm text-slate-300/90 leading-relaxed mb-5">
+                Custom Windows automation scripts and PySide6 utilities that streamline file organization, system diagnostics, hotkey macros, and local SQLite task logging.
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/10">
+              <div class="flex gap-1.5">
+                <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-emerald-300">PowerShell</span>
+                <span class="px-2.5 py-1 rounded-lg bg-white/5 text-[11px] font-mono text-sky-300">PySide6</span>
+              </div>
+              <span class="text-xs font-mono text-slate-400">OS Tools</span>
+            </div>
+          </div>
+
+          <!-- Project 4: GitHub Repositories -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card flex flex-col justify-between group hover:-translate-y-1.5">
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-400/30 flex items-center justify-center text-white text-xl">
+                  <i class="fa-brands fa-github"></i>
+                </div>
+                <span class="font-mono text-xs text-sky-400">@ashikbiswas01</span>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2.5 group-hover:text-sky-300 transition">
+                GitHub Repositories
+              </h3>
+              <p class="text-sm text-slate-300/90 leading-relaxed mb-5">
+                Explore my open-source experiments, Pygame prototypes, Python CLI tools, and academic CST coursework repositories on GitHub.
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/10">
+              <span class="text-xs font-mono text-slate-400">github.com/ashikbiswas01</span>
+              <a href="https://github.com/ashikbiswas01" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 transition">
+                <span>Open Profile</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 05: EXPERIENCE & FUTURE GOALS -->
+    <section id="journey" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 05</span>
+          <div class="h-px w-12 bg-sky-400/40"></div>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-12">
+          Experience &amp; <span class="text-gradient-cyan">Future Goals</span>
+        </h2>
+
+        <div class="relative max-w-4xl mx-auto">
+          <!-- Vertical Timeline Line -->
+          <div class="absolute left-4 sm:left-8 top-2 bottom-2 w-0.5 bg-gradient-to-b from-sky-400 via-purple-500 to-emerald-400/40"></div>
+
+          <div class="space-y-8">
+            <!-- Milestone 1 -->
+            <div class="relative pl-12 sm:pl-20">
+              <div class="absolute left-2 sm:left-6 top-6 w-4 h-4 rounded-full bg-sky-400 ring-4 ring-sky-400/20"></div>
+              <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="font-mono text-xs font-semibold text-sky-400">SESSION 2024–2025 // PRESENT</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-sky-500/15 text-sky-300">Academic Foundation</span>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+                  Computer Science &amp; Technology Diploma
+                </h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Currently in my 4th Semester at Jashore Polytechnic Institute (BTEB), mastering core data structures, algorithms, database management, computer architecture, and object-oriented programming.
+                </p>
+              </div>
+            </div>
+
+            <!-- Milestone 2 -->
+            <div class="relative pl-12 sm:pl-20">
+              <div class="absolute left-2 sm:left-6 top-6 w-4 h-4 rounded-full bg-indigo-400 ring-4 ring-indigo-400/20"></div>
+              <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="font-mono text-xs font-semibold text-indigo-400">HANDS-ON CRAFT</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-indigo-500/15 text-indigo-300">Full-Stack &amp; Desktop</span>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+                  Exploring Software &amp; Web Development
+                </h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Building modern responsive web interfaces with HTML, CSS, JavaScript, and Three.js alongside native Python desktop apps powered by PySide6, Pygame, and SQLite.
+                </p>
+              </div>
+            </div>
+
+            <!-- Milestone 3 -->
+            <div class="relative pl-12 sm:pl-20">
+              <div class="absolute left-2 sm:left-6 top-6 w-4 h-4 rounded-full bg-purple-400 ring-4 ring-purple-400/20"></div>
+              <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="font-mono text-xs font-semibold text-purple-400">FLAGSHIP R&amp;D</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-purple-500/15 text-purple-300">AI &amp; Voice Systems</span>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+                  Developing JARVIS AI Assistant
+                </h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Architecting a modular, event-driven voice assistant capable of understanding Bangla, Banglish, and English—integrating local Ollama models, LLM APIs, Edge TTS, and deep Windows control.
+                </p>
+              </div>
+            </div>
+
+            <!-- Milestone 4 -->
+            <div class="relative pl-12 sm:pl-20">
+              <div class="absolute left-2 sm:left-6 top-6 w-4 h-4 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20"></div>
+              <div class="glass-panel rounded-3xl p-6 sm:p-7 interactive-card">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <span class="font-mono text-xs font-semibold text-emerald-400">HORIZON // FUTURE GOAL</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-500/15 text-emerald-300">Next Chapter</span>
+                </div>
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+                  Growing as a Software Developer
+                </h3>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Aiming to engineer scalable AI-integrated software products, contribute to impactful open-source ecosystems, and bridge creative 3D computing with intelligent automation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 06: CONTACT -->
+    <section id="contact" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="reveal-up">
+        <div class="glass-panel rounded-3xl p-8 sm:p-12 lg:p-14 border-sky-400/30 relative overflow-hidden interactive-card">
+          <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-sky-500/15 blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-purple-500/15 blur-3xl pointer-events-none"></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
+            <div class="lg:col-span-7 space-y-5">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-xs sm:text-sm font-semibold text-sky-400 tracking-widest">SECTION 06</span>
+                <div class="h-px w-12 bg-sky-400/40"></div>
+              </div>
+
+              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+                Let's build something <span class="text-gradient-cosmic">stellar together.</span>
+              </h2>
+
+              <p class="text-slate-300 text-sm sm:text-base max-w-xl leading-relaxed">
+                Have a project idea, want to collaborate on Python/AI tools, or just want to chat about code, games, and the cosmos? Reach out directly via WhatsApp, Email, or any of my social handles.
+              </p>
+
+              <!-- Direct Contact Action Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <!-- WhatsApp Card -->
+                <a href="https://wa.me/8801931443324?text=Hi%20Ashik!%20Let's%20connect."
+                   data-platform="whatsapp" target="_blank" rel="noopener noreferrer"
+                   class="p-4 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/30 transition flex items-center gap-4 group">
+                  <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl group-hover:scale-110 transition">
+                    <i class="fa-brands fa-whatsapp"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs font-mono text-emerald-300 block">WHATSAPP DIRECT</span>
+                    <span class="text-sm sm:text-base font-bold text-white">+880 1931443324</span>
+                  </div>
+                </a>
+
+                <!-- Email Card -->
+                <a href="mailto:ashikbiswas011@gmail.com"
+                   data-platform="email"
+                   class="p-4 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/30 transition flex items-center gap-4 group">
+                  <div class="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-400 text-xl group-hover:scale-110 transition">
+                    <i class="fa-solid fa-envelope"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <span class="text-xs font-mono text-sky-300 block">EMAIL INBOX</span>
+                    <span class="text-xs sm:text-sm font-bold text-white truncate block">ashikbiswas011@gmail.com</span>
+                  </div>
+                </a>
+              </div>
+
+              <!-- Quick Copy Utilities -->
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <button type="button" onclick="copyTextToClipboard('+880 1931443324', 'WhatsApp number copied!')"
+                        class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 transition flex items-center gap-2">
+                  <i class="fa-regular fa-copy text-emerald-400"></i>
+                  <span>Copy Phone</span>
+                </button>
+                <button type="button" onclick="copyTextToClipboard('ashikbiswas011@gmail.com', 'Email address copied!')"
+                        class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 transition flex items-center gap-2">
+                  <i class="fa-regular fa-copy text-sky-400"></i>
+                  <span>Copy Email</span>
+                </button>
+                <button type="button" onclick="copyTextToClipboard('ashikbiswas01', 'Username copied: ashikbiswas01')"
+                        class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 transition flex items-center gap-2">
+                  <i class="fa-regular fa-copy text-purple-400"></i>
+                  <span>Copy @ashikbiswas01</span>
+                </button>
+              </div>
+
+              <!-- All Social Media Platforms Grid -->
+              <div class="pt-3 border-t border-white/10">
+                <span class="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-3">
+                  Connect Across Social Media (<span class="text-sky-300">@ashikbiswas01</span> &bull; IG/TT/YT: <span class="text-pink-300">@ashik_biswas01</span>):
+                </span>
+                <div class="flex flex-wrap gap-2">
+                  <a href="https://facebook.com/ashikbiswas01" data-platform="facebook" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-blue-500/15 border border-white/10 hover:border-blue-400/40 text-xs font-medium text-slate-200 hover:text-blue-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-facebook-f text-blue-400"></i><span>Facebook (@ashikbiswas01)</span>
+                  </a>
+                  <a href="https://instagram.com/ashik_biswas01" data-platform="instagram" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-pink-500/15 border border-white/10 hover:border-pink-400/40 text-xs font-medium text-slate-200 hover:text-pink-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-instagram text-pink-400"></i><span>Instagram (@ashik_biswas01)</span>
+                  </a>
+                  <a href="https://x.com/ashikbiswas01" data-platform="x" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-slate-300/40 text-xs font-medium text-slate-200 hover:text-white transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-x-twitter text-slate-200"></i><span>X (@ashikbiswas01)</span>
+                  </a>
+                  <a href="https://linkedin.com/in/ashikbiswas01" data-platform="linkedin" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-sky-500/15 border border-white/10 hover:border-sky-400/40 text-xs font-medium text-slate-200 hover:text-sky-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-linkedin-in text-sky-400"></i><span>LinkedIn (@ashikbiswas01)</span>
+                  </a>
+                  <a href="https://github.com/ashikbiswas01" data-platform="github" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-purple-500/15 border border-white/10 hover:border-purple-400/40 text-xs font-medium text-slate-200 hover:text-purple-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-github text-purple-300"></i><span>GitHub (@ashikbiswas01)</span>
+                  </a>
+                  <a href="https://youtube.com/@ashik_biswas01" data-platform="youtube" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/40 text-xs font-medium text-slate-200 hover:text-rose-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-youtube text-rose-500"></i><span>YouTube (@ashik_biswas01)</span>
+                  </a>
+                  <a href="https://wa.me/8801931443324" data-platform="whatsapp" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-400/40 text-xs font-medium text-slate-200 hover:text-emerald-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-400"></i><span>WhatsApp</span>
+                  </a>
+                  <a href="https://t.me/ashikbiswas01" data-platform="telegram" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-400/40 text-xs font-medium text-slate-200 hover:text-cyan-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-telegram text-cyan-400"></i><span>Telegram (@ashikbiswas01)</span>
+                  </a>
+                  <a href="https://tiktok.com/@ashik_biswas01" data-platform="tiktok" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-fuchsia-500/15 border border-white/10 hover:border-fuchsia-400/40 text-xs font-medium text-slate-200 hover:text-fuchsia-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-tiktok text-fuchsia-400"></i><span>TikTok (@ashik_biswas01)</span>
+                  </a>
+                  <a href="https://discord.com/users/ashikbiswas01" data-platform="discord" target="_blank" rel="noopener noreferrer"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-indigo-500/15 border border-white/10 hover:border-indigo-400/40 text-xs font-medium text-slate-200 hover:text-indigo-300 transition inline-flex items-center gap-2">
+                    <i class="fa-brands fa-discord text-indigo-400"></i><span>Discord (@ashikbiswas01)</span>
+                  </a>
+                  <a href="mailto:ashikbiswas011@gmail.com" data-platform="email"
+                     class="px-3 py-2 rounded-xl bg-white/5 hover:bg-amber-500/15 border border-white/10 hover:border-amber-400/40 text-xs font-medium text-slate-200 hover:text-amber-300 transition inline-flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-amber-400"></i><span>Email</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive 3D Scene Control Deck in Contact Section -->
+            <div class="lg:col-span-5">
+              <div class="rounded-2xl bg-[#050914]/85 border border-white/10 p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                  <span class="font-mono text-xs font-semibold text-sky-300 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>3D COSMOS CONTROL DECK</span>
+                  </span>
+                  <span class="text-[10px] font-mono text-slate-400">THREE.JS r128</span>
+                </div>
+
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Customize the live background environment directly from here:
+                </p>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                  <button type="button" onclick="setCameraPreset('hero')"
+                          class="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/40 text-xs font-medium text-slate-200 transition text-left flex items-center gap-2">
+                    <i class="fa-solid fa-earth-americas text-sky-400"></i>
+                    <span>Wide Orbit</span>
+                  </button>
+
+                  <button type="button" onclick="setCameraPreset('macbook')"
+                          class="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-purple-500/20 border border-white/10 hover:border-purple-400/40 text-xs font-medium text-slate-200 transition text-left flex items-center gap-2">
+                    <i class="fa-solid fa-laptop text-purple-400"></i>
+                    <span>MacBook Close</span>
+                  </button>
+
+                  <button type="button" onclick="toggleGalaxyBoost()"
+                          class="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-amber-500/20 border border-white/10 hover:border-amber-400/40 text-xs font-medium text-slate-200 transition text-left flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-400"></i>
+                    <span>Galaxy Boost</span>
+                  </button>
+
+                  <button type="button" onclick="toggleWireframeMode()"
+                          class="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-400/40 text-xs font-medium text-slate-200 transition text-left flex items-center gap-2">
+                    <i class="fa-solid fa-border-all text-emerald-400"></i>
+                    <span>Wireframe</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pb-24 pt-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+      <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+        <p class="font-mono">
+          &copy; <span id="year"></span> Ashik Biswas — Jashore Polytechnic Institute, Bangladesh.
+        </p>
+        <p class="font-mono text-slate-500">
+          Crafted with Three.js, Tailwind CSS &amp; Cosmic Curiosity.
+        </p>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Application Logic & Procedural 3D Three.js Cosmic Engine -->
+  <script>
+    // =========================================================================
+    // 0. EASY-TO-EDIT SOCIAL MEDIA LINKS CONFIGURATION
+    // =========================================================================
+    const SOCIAL_LINKS = {
+      facebook: 'https://facebook.com/ashikbiswas01',
+      instagram: 'https://instagram.com/ashik_biswas01',
+      x: 'https://x.com/ashikbiswas01',
+      linkedin: 'https://linkedin.com/in/ashikbiswas01',
+      github: 'https://github.com/ashikbiswas01',
+      youtube: 'https://youtube.com/@ashik_biswas01',
+      whatsapp: 'https://wa.me/8801931443324',
+      telegram: 'https://t.me/ashikbiswas01',
+      tiktok: 'https://tiktok.com/@ashik_biswas01',
+      discord: 'https://discord.com/users/ashikbiswas01',
+      email: 'mailto:ashikbiswas011@gmail.com'
+    };
+
+    // Hydrate all social links across Hero, Navbar, and Contact sections
+    document.querySelectorAll('[data-platform]').forEach(el => {
+      const platform = el.getAttribute('data-platform');
+      if (SOCIAL_LINKS[platform] && el.tagName === 'A') {
+        // Preserve WhatsApp prefilled text if already present
+        if (platform === 'whatsapp' && el.href.includes('?text=')) return;
+        el.href = SOCIAL_LINKS[platform];
+      }
+    });
+
+    // Set current year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // =========================================================================
+    // 1. UI INTERACTIONS, SCROLLSPY, CLIPBOARD & JARVIS SIMULATOR
+    // =========================================================================
+
+    function showToast(msg) {
+      const box = document.getElementById('toast-box');
+      const text = document.getElementById('toast-message');
+      if (!box || !text) return;
+      text.textContent = msg;
+      box.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        box.classList.remove('translate-y-3', 'opacity-0');
+      });
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('translate-y-3', 'opacity-0');
+        setTimeout(() => box.classList.add('hidden'), 300);
+      }, 2600);
+    }
+
+    // Clipboard helper using document.execCommand('copy') for iframe compatibility
+    function copyTextToClipboard(text, successMsg) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      tempInput.style.position = 'fixed';
+      tempInput.style.opacity = '0';
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+      } catch (err) {
+        showToast('Copied: ' + text);
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    // Mobile Navigation Drawer Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const isHidden = mobileDrawer.classList.contains('hidden');
+      if (isHidden) {
+        mobileDrawer.classList.remove('hidden');
+        mobileMenuIcon.classList.remove('fa-bars');
+        mobileMenuIcon.classList.add('fa-xmark');
+      } else {
+        mobileDrawer.classList.add('hidden');
+        mobileMenuIcon.classList.remove('fa-xmark');
+        mobileMenuIcon.classList.add('fa-bars');
+      }
+    });
+
+    document.querySelectorAll('.mobile-nav-item').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileDrawer.classList.add('hidden');
+        mobileMenuIcon.classList.remove('fa-xmark');
+        mobileMenuIcon.classList.add('fa-bars');
+      });
+    });
+
+    // JARVIS Multilingual Interactive Terminal Simulator
+    const jarvisSamples = {
+      bangla: {
+        badge: 'LANG: BANGLA (বাংলা)',
+        user: 'জার্ভিস, আজকের আবহাওয়া এবং সিপিইউ স্ট্যাটাস বলো।',
+        reply: '[JARVIS]: জশোরে আকাশ পরিষ্কার (২৬°C)। সিস্টেম কোর স্বাভাবিক আছে, আশিক।'
+      },
+      banglish: {
+        badge: 'LANG: BANGLISH',
+        user: 'Jarvis, VS Code open koro ar Ollama model check koro.',
+        reply: '[JARVIS]: VS Code launch korchi. Local Llama3 model ready ache!'
+      },
+      english: {
+        badge: 'LANG: ENGLISH',
+        user: 'Jarvis, run diagnostics on the event-driven speech bus.',
+        reply: '[JARVIS]: Event bus nominal. Edge-TTS & Speech Recognition synced at 138ms.'
+      }
+    };
+
+    function simulateJarvisCommand(langKey) {
+      const data = jarvisSamples[langKey];
+      if (!data) return;
+      const terminal = document.getElementById('jarvis-terminal');
+      const badge = document.getElementById('hud-lang-badge');
+      const latency = document.getElementById('hud-latency');
+
+      badge.textContent = data.badge;
+      latency.textContent = (115 + Math.floor(Math.random() * 45)) + ' ms';
+
+      const userLine = document.createElement('div');
+      userLine.className = 'text-sky-300';
+      userLine.textContent = '> User: "' + data.user + '"';
+
+      const botLine = document.createElement('div');
+      botLine.className = 'text-emerald-300';
+      botLine.textContent = data.reply;
+
+      terminal.appendChild(userLine);
+      terminal.appendChild(botLine);
+      terminal.scrollTop = terminal.scrollHeight;
+
+      // Also pulse the 3D MacBook HUD screen
+      window.hudPulseIntensity = 1.0;
+    }
+
+    // Scroll Reveal & Skill Bar Animation Observer
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          // Animate any skill bars inside
+          entry.target.querySelectorAll('.skill-bar').forEach(bar => {
+            const targetWidth = bar.getAttribute('data-width');
+            if (targetWidth) bar.style.width = targetWidth;
+          });
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
+
+    // Active Navigation Scrollspy
+    const sections = ['about', 'passions', 'skills', 'projects', 'journey', 'contact'];
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateScrollspy() {
+      const scrollPos = window.scrollY + 220;
+      let currentId = '';
+      sections.forEach(id => {
+        const sec = document.getElementById(id);
+        if (sec && sec.offsetTop <= scrollPos && (sec.offsetTop + sec.offsetHeight) > scrollPos) {
+          currentId = id;
+        }
+      });
+
+      navLinks.forEach(link => {
+        if (link.getAttribute('data-nav') === currentId) {
+          link.classList.add('bg-sky-500/20', 'text-sky-300', 'border', 'border-sky-400/30');
+          link.classList.remove('text-slate-300');
+        } else {
+          link.classList.remove('bg-sky-500/20', 'text-sky-300', 'border', 'border-sky-400/30');
+          link.classList.add('text-slate-300');
+        }
+      });
+    }
+    window.addEventListener('scroll', updateScrollspy, { passive: true });
+
+    // =========================================================================
+    // 2. THREE.JS PROCEDURAL COSMIC GALAXY & 3D MACBOOK PRO ENGINE
+    // =========================================================================
+
+    let scene, camera, renderer;
+    let galaxyGroup, macbookGroup, ringsGroup, nebulaGroup;
+    let starFieldOuter, spiralGalaxyPoints, dustPoints;
+    let hudCanvas, hudCtx, hudTexture;
+    let clock;
+
+    // Interactive State
+    const state = {
+      autoOrbit: true,
+      galaxyBoost: false,
+      wireframe: false,
+      focusMacbook: false,
+      mouseX: 0,
+      mouseY: 0,
+      targetRotX: 0,
+      targetRotY: 0,
+      isDragging: false,
+      prevPointerX: 0,
+      prevPointerY: 0,
+      dragOffsetX: 0,
+      dragOffsetY: 0,
+      scrollProgress: 0
+    };
+    window.hudPulseIntensity = 0;
+
+    // Create soft radial glow sprite texture procedurally (no external images)
+    function createStarSpriteTexture() {
+      const c = document.createElement('canvas');
+      c.width = 64;
+      c.height = 64;
+      const ctx = c.getContext('2d');
+      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.25, 'rgba(186, 230, 253, 0.85)');
+      grad.addColorStop(0.6, 'rgba(56, 189, 248, 0.25)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 64, 64);
+      const tex = new THREE.CanvasTexture(c);
+      return tex;
+    }
+
+    // Create Procedural Animated JARVIS HUD Canvas Texture for MacBook Screen
+    function initMacbookHudTexture() {
+      hudCanvas = document.createElement('canvas');
+      hudCanvas.width = 1024;
+      hudCanvas.height = 640;
+      hudCtx = hudCanvas.getContext('2d');
+      hudTexture = new THREE.CanvasTexture(hudCanvas);
+      hudTexture.minFilter = THREE.LinearFilter;
+      hudTexture.magFilter = THREE.LinearFilter;
+    }
+
+    function updateMacbookHudCanvas(elapsed) {
+      if (!hudCtx || !hudTexture) return;
+      const w = hudCanvas.width;
+      const h = hudCanvas.height;
+
+      // Deep space terminal backdrop
+      hudCtx.fillStyle = '#040814';
+      hudCtx.fillRect(0, 0, w, h);
+
+      // Subtle cyber grid
+      hudCtx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
+      hudCtx.lineWidth = 1;
+      for (let x = 0; x < w; x += 40) {
+        hudCtx.beginPath();
+        hudCtx.moveTo(x, 0);
+        hudCtx.lineTo(x, h);
+        hudCtx.stroke();
+      }
+      for (let y = 0; y < h; y += 40) {
+        hudCtx.beginPath();
+        hudCtx.moveTo(0, y);
+        hudCtx.lineTo(w, y);
+        hudCtx.stroke();
+      }
+
+      // Top macOS / JARVIS Bar
+      hudCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      hudCtx.fillRect(0, 0, w, 38);
+      hudCtx.fillStyle = '#38bdf8';
+      hudCtx.font = 'bold 16px monospace';
+      hudCtx.fillText('JARVIS OS // ASHIK BISWAS [CST-JPI]', 24, 24);
+      hudCtx.fillStyle = '#34d399';
+      hudCtx.fillText('ONLINE • BANGLA / ENGLISH', w - 285, 24);
+
+      // Central Rotating Arc Reactor / AI Core Ring
+      const cx = w * 0.5;
+      const cy = h * 0.48;
+      const pulse = 1 + Math.sin(elapsed * 3) * 0.04 + window.hudPulseIntensity * 0.12;
+      window.hudPulseIntensity = Math.max(0, window.hudPulseIntensity - 0.02);
+
+      hudCtx.save();
+      hudCtx.translate(cx, cy);
+
+      // Outer segmented ring
+      hudCtx.save();
+      hudCtx.rotate(elapsed * 0.6);
+      hudCtx.strokeStyle = '#38bdf8';
+      hudCtx.lineWidth = 4;
+      hudCtx.setLineDash([45, 20, 15, 20]);
+      hudCtx.beginPath();
+      hudCtx.arc(0, 0, 135 * pulse, 0, Math.PI * 2);
+      hudCtx.stroke();
+      hudCtx.restore();
+
+      // Middle purple ring
+      hudCtx.save();
+      hudCtx.rotate(-elapsed * 1.1);
+      hudCtx.strokeStyle = '#c084fc';
+      hudCtx.lineWidth = 3;
+      hudCtx.setLineDash([25, 18]);
+      hudCtx.beginPath();
+      hudCtx.arc(0, 0, 102 * pulse, 0, Math.PI * 2);
+      hudCtx.stroke();
+      hudCtx.restore();
+
+      // Inner glowing core
+      const coreGrad = hudCtx.createRadialGradient(0, 0, 5, 0, 0, 75 * pulse);
+      coreGrad.addColorStop(0, 'rgba(125, 211, 252, 0.85)');
+      coreGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.25)');
+      coreGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      hudCtx.fillStyle = coreGrad;
+      hudCtx.beginPath();
+      hudCtx.arc(0, 0, 75 * pulse, 0, Math.PI * 2);
+      hudCtx.fill();
+
+      hudCtx.fillStyle = '#ffffff';
+      hudCtx.font = 'bold 22px monospace';
+      hudCtx.textAlign = 'center';
+      hudCtx.fillText('J.A.R.V.I.S', 0, 7);
+      hudCtx.restore();
+
+      // Left Telemetry Panel
+      hudCtx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      hudCtx.lineWidth = 1.5;
+      hudCtx.strokeRect(28, 65, 255, 220);
+      hudCtx.fillStyle = '#7dd3fc';
+      hudCtx.font = 'bold 14px monospace';
+      hudCtx.textAlign = 'left';
+      hudCtx.fillText('SYSTEM TELEMETRY', 44, 92);
+
+      const bars = [
+        { label: 'PYTHON CORE', val: 0.92, color: '#38bdf8' },
+        { label: 'OLLAMA LLM', val: 0.84, color: '#c084fc' },
+        { label: 'EDGE-TTS', val: 0.89, color: '#34d399' },
+        { label: 'EVENT BUS', val: 0.96, color: '#fbbf24' }
+      ];
+      bars.forEach((b, idx) => {
+        const by = 122 + idx * 38;
+        hudCtx.fillStyle = '#94a3b8';
+        hudCtx.font = '12px monospace';
+        hudCtx.fillText(b.label, 44, by);
+        hudCtx.fillStyle = 'rgba(255,255,255,0.1)';
+        hudCtx.fillRect(44, by + 6, 215, 8);
+        hudCtx.fillStyle = b.color;
+        const animVal = Math.min(1, b.val + Math.sin(elapsed * 2 + idx) * 0.03);
+        hudCtx.fillRect(44, by + 6, 215 * animVal, 8);
+      });
+
+      // Right Terminal Logs
+      hudCtx.strokeStyle = 'rgba(192, 132, 252, 0.4)';
+      hudCtx.strokeRect(w - 283, 65, 255, 220);
+      hudCtx.fillStyle = '#e879f9';
+      hudCtx.font = 'bold 14px monospace';
+      hudCtx.fillText('LIVE EVENT STREAM', w - 267, 92);
+
+      const logs = [
+        '> init_audio_stream()',
+        '> wake_word: "JARVIS"',
+        '> lang: BN / EN ready',
+        '> sqlite_db: connected',
+        '> gpu_shader: 60 FPS',
+        '> status: OPTIMAL'
+      ];
+      hudCtx.font = '12px monospace';
+      logs.forEach((line, i) => {
+        hudCtx.fillStyle = i === logs.length - 1 ? '#34d399' : '#cbd5e1';
+        hudCtx.fillText(line, w - 267, 122 + i * 26);
+      });
+
+      // Bottom Audio Waveform Visualizer
+      hudCtx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      hudCtx.strokeRect(28, h - 135, w - 56, 105);
+      hudCtx.fillStyle = '#38bdf8';
+      hudCtx.font = '12px monospace';
+      hudCtx.fillText('VOICE SYNTHESIS WAVEFORM // EDGE-TTS NEURAL', 44, h - 110);
+
+      const barCount = 56;
+      const startX = 44;
+      const barAreaW = w - 88;
+      const step = barAreaW / barCount;
+      for (let i = 0; i < barCount; i++) {
+        const amp = (Math.sin(elapsed * 6 + i * 0.35) * 0.5 + 0.5) *
+                    (Math.cos(elapsed * 3.2 - i * 0.2) * 0.5 + 0.5);
+        const bh = 8 + amp * 48;
+        hudCtx.fillStyle = i % 2 === 0 ? '#38bdf8' : '#818cf8';
+        hudCtx.fillRect(startX + i * step, h - 42 - bh, step * 0.62, bh);
+      }
+
+      hudTexture.needsUpdate = true;
+    }
+
+    // Build Procedural 3D MacBook Pro Model
+    function buildProceduralMacbook() {
+      macbookGroup = new THREE.Group();
+
+      // Materials
+      const chassisMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        metalness: 0.85,
+        roughness: 0.24
+      });
+
+      const darkTrimMat = new THREE.MeshStandardMaterial({
+        color: 0x090d16,
+        metalness: 0.5,
+        roughness: 0.4
+      });
+
+      const keycapMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        metalness: 0.2,
+        roughness: 0.6
+      });
+
+      const glowStripMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8
+      });
+
+      // 1. Base Unibody Deck
+      const baseGeo = new THREE.BoxGeometry(3.4, 0.11, 2.35);
+      const baseMesh = new THREE.Mesh(baseGeo, chassisMat);
+      baseMesh.position.set(0, 0, 0);
+      macbookGroup.add(baseMesh);
+
+      // Subtle Cyan Edge Accent on Base
+      const accentGeo = new THREE.BoxGeometry(3.42, 0.02, 2.37);
+      const accentMesh = new THREE.Mesh(accentGeo, glowStripMat);
+      accentMesh.position.set(0, 0.01, 0);
+      macbookGroup.add(accentMesh);
+
+      // Trackpad
+      const trackpadGeo = new THREE.BoxGeometry(1.05, 0.015, 0.65);
+      const trackpadMesh = new THREE.Mesh(trackpadGeo, darkTrimMat);
+      trackpadMesh.position.set(0, 0.056, 0.72);
+      macbookGroup.add(trackpadMesh);
+
+      // Keyboard Well & Key Rows
+      const kbWellGeo = new THREE.BoxGeometry(2.95, 0.015, 1.05);
+      const kbWellMesh = new THREE.Mesh(kbWellGeo, darkTrimMat);
+      kbWellMesh.position.set(0, 0.055, -0.22);
+      macbookGroup.add(kbWellMesh);
+
+      const rows = 5;
+      const cols = 13;
+      const keyGeo = new THREE.BoxGeometry(0.19, 0.022, 0.16);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const key = new THREE.Mesh(keyGeo, keycapMat);
+          const kx = -1.32 + c * 0.22;
+          const kz = -0.62 + r * 0.20;
+          key.position.set(kx, 0.068, kz);
+          macbookGroup.add(key);
+        }
+      }
+
+      // 2. Hinged Display Lid Assembly
+      const lidPivot = new THREE.Group();
+      lidPivot.position.set(0, 0.055, -1.14);
+      // Open angle (~108 degrees)
+      lidPivot.rotation.x = -0.32;
+      macbookGroup.add(lidPivot);
+
+      // Aluminum Back Lid
+      const lidGeo = new THREE.BoxGeometry(3.4, 2.22, 0.07);
+      const lidMesh = new THREE.Mesh(lidGeo, chassisMat);
+      lidMesh.position.set(0, 1.11, 0);
+      lidPivot.add(lidMesh);
+
+      // Glowing Back Emblem Ring
+      const logoRingGeo = new THREE.RingGeometry(0.16, 0.22, 32);
+      const logoRingMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
+      const logoRing = new THREE.Mesh(logoRingGeo, logoRingMat);
+      logoRing.position.set(0, 1.11, -0.038);
+      lidPivot.add(logoRing);
+
+      // Front Bezel
+      const bezelGeo = new THREE.PlaneGeometry(3.32, 2.14);
+      const bezelMesh = new THREE.Mesh(bezelGeo, darkTrimMat);
+      bezelMesh.position.set(0, 1.11, 0.037);
+      lidPivot.add(bezelMesh);
+
+      // Illuminated Display Panel with Live JARVIS Canvas Texture
+      initMacbookHudTexture();
+      const screenGeo = new THREE.PlaneGeometry(3.16, 1.98);
+      const screenMat = new THREE.MeshBasicMaterial({
+        map: hudTexture
+      });
+      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+      screenMesh.position.set(0, 1.12, 0.04);
+      lidPivot.add(screenMesh);
+
+      // Position MacBook gracefully in right-center 3D space
+      macbookGroup.position.set(1.65, -0.55, 0.8);
+      macbookGroup.rotation.set(0.14, -0.45, -0.04);
+      scene.add(macbookGroup);
+    }
+
+    // Build Multi-Layer Deep-Space Spiral Galaxy, Nebula Dust & Cosmic Rings
+    function buildCosmicEnvironment() {
+      galaxyGroup = new THREE.Group();
+      scene.add(galaxyGroup);
+
+      const starSprite = createStarSpriteTexture();
+
+      // Layer 1: Multi-arm Spiral Galaxy Particles (4,200 stars)
+      const galaxyCount = 4200;
+      const positions = new Float32Array(galaxyCount * 3);
+      const colors = new Float32Array(galaxyCount * 3);
+
+      const colorInside = new THREE.Color(0x7dd3fc); // Bright Cyan-White Core
+      const colorMid = new THREE.Color(0x818cf8);    // Indigo Spiral Arms
+      const colorOutside = new THREE.Color(0xc084fc); // Cosmic Purple Halo
+
+      const branches = 4;
+      const maxRadius = 18;
+
+      for (let i = 0; i < galaxyCount; i++) {
+        const i3 = i * 3;
+        const radius = Math.pow(Math.random(), 1.6) * maxRadius;
+        const spinAngle = radius * 0.42;
+        const branchAngle = ((i % branches) / branches) * Math.PI * 2;
+
+        const spread = (Math.random() - 0.5) * Math.pow(radius / maxRadius, 0.8) * 2.6;
+        const spreadY = (Math.random() - 0.5) * (1.4 - (radius / maxRadius) * 0.9);
+        const spreadZ = (Math.random() - 0.5) * Math.pow(radius / maxRadius, 0.8) * 2.6;
+
+        positions[i3] = Math.cos(branchAngle + spinAngle) * radius + spread;
+        positions[i3 + 1] = spreadY - 1.5;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + spreadZ - 4.0;
+
+        // Color blend from core to outer rim
+        const mixedColor = colorInside.clone();
+        if (radius < maxRadius * 0.45) {
+          mixedColor.lerp(colorMid, radius / (maxRadius * 0.45));
+        } else {
+          mixedColor.copy(colorMid).lerp(colorOutside, (radius - maxRadius * 0.45) / (maxRadius * 0.55));
+        }
+
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+      }
+
+      const galaxyGeo = new THREE.BufferGeometry();
+      galaxyGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      galaxyGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const galaxyMat = new THREE.PointsMaterial({
+        size: 0.16,
+        map: starSprite,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      spiralGalaxyPoints = new THREE.Points(galaxyGeo, galaxyMat);
+      spiralGalaxyPoints.rotation.x = 0.35;
+      spiralGalaxyPoints.rotation.z = -0.18;
+      galaxyGroup.add(spiralGalaxyPoints);
+
+      // Layer 2: Deep Space Background Starfield (1,800 distant stars)
+      const bgCount = 1800;
+      const bgPos = new Float32Array(bgCount * 3);
+      for (let i = 0; i < bgCount; i++) {
+        const i3 = i * 3;
+        const r = 24 + Math.random() * 45;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        bgPos[i3] = r * Math.sin(phi) * Math.cos(theta);
+        bgPos[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        bgPos[i3 + 2] = r * Math.cos(phi);
+      }
+      const bgGeo = new THREE.BufferGeometry();
+      bgGeo.setAttribute('position', new THREE.BufferAttribute(bgPos, 3));
+      const bgMat = new THREE.PointsMaterial({
+        size: 0.14,
+        map: starSprite,
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.7,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      starFieldOuter = new THREE.Points(bgGeo, bgMat);
+      galaxyGroup.add(starFieldOuter);
+
+      // Layer 3: Nebula Dust Clouds (Large soft additive particles)
+      nebulaGroup = new THREE.Group();
+      const dustCount = 90;
+      const dustPos = new Float32Array(dustCount * 3);
+      const dustColors = new Float32Array(dustCount * 3);
+      const nebCyan = new THREE.Color(0x0284c7);
+      const nebPurple = new THREE.Color(0x7e22ce);
+
+      for (let i = 0; i < dustCount; i++) {
+        const i3 = i * 3;
+        dustPos[i3] = (Math.random() - 0.5) * 24;
+        dustPos[i3 + 1] = (Math.random() - 0.5) * 12;
+        dustPos[i3 + 2] = -4 - Math.random() * 14;
+        const c = i % 2 === 0 ? nebCyan : nebPurple;
+        dustColors[i3] = c.r;
+        dustColors[i3 + 1] = c.g;
+        dustColors[i3 + 2] = c.b;
+      }
+      const dustGeo = new THREE.BufferGeometry();
+      dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+      dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColors, 3));
+      const dustMat = new THREE.PointsMaterial({
+        size: 3.4,
+        map: starSprite,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.12,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      dustPoints = new THREE.Points(dustGeo, dustMat);
+      nebulaGroup.add(dustPoints);
+      galaxyGroup.add(nebulaGroup);
+
+      // Layer 4: Glowing Planetary / Cosmic Rings
+      ringsGroup = new THREE.Group();
+      ringsGroup.position.set(1.65, -0.55, 0.8);
+      ringsGroup.rotation.set(0.55, 0.25, -0.2);
+
+      const ringConfigs = [
+        { inner: 2.75, outer: 2.82, color: 0x38bdf8, opacity: 0.42 },
+        { inner: 3.15, outer: 3.20, color: 0x818cf8, opacity: 0.30 },
+        { inner: 3.65, outer: 3.69, color: 0xc084fc, opacity: 0.22 }
+      ];
+
+      ringConfigs.forEach(cfg => {
+        const rGeo = new THREE.RingGeometry(cfg.inner, cfg.outer, 96);
+        const rMat = new THREE.MeshBasicMaterial({
+          color: cfg.color,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: cfg.opacity,
+          blending: THREE.AdditiveBlending
+        });
+        const rMesh = new THREE.Mesh(rGeo, rMat);
+        rMesh.rotation.x = Math.PI / 2;
+        ringsGroup.add(rMesh);
+      });
+
+      scene.add(ringsGroup);
+    }
+
+    function initThreeScene() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x04060e, 0.024);
+      camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 180);
+      // Zoomed-out default vantage point to frame the entire spiral galaxy, rings, and 3D MacBook Pro
+      camera.position.set(0, 1.15, 11.4);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Cosmic & Studio Rim Lighting for 3D MacBook Pro
+      const ambientLight = new THREE.AmbientLight(0x94a3b8, 0.75);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0x7dd3fc, 1.5);
+      keyLight.position.set(5, 6, 6);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.PointLight(0xc084fc, 2.2, 18);
+      rimLight.position.set(-4, 3, 2);
+      scene.add(rimLight);
+
+      const screenBounceLight = new THREE.PointLight(0x38bdf8, 1.4, 8);
+      screenBounceLight.position.set(1.65, 0.6, 2.2);
+      scene.add(screenBounceLight);
+
+      buildCosmicEnvironment();
+      buildProceduralMacbook();
+
+      clock = new THREE.Clock();
+
+      // Event Listeners: Resize, Pointer Drag, Mouse Parallax, Scroll Choreography
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('mousemove', onPointerMove, { passive: true });
+      window.addEventListener('scroll', onScrollUpdate, { passive: true });
+
+      const domEl = renderer.domElement;
+      domEl.addEventListener('mousedown', onDragStart);
+      window.addEventListener('mouseup', onDragEnd);
+      domEl.addEventListener('touchstart', onTouchStart, { passive: true });
+      domEl.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchend', onDragEnd);
+
+      // Adjust initial layout for mobile vs desktop
+      adjustResponsiveModelPlacement();
+    }
+
+    function adjustResponsiveModelPlacement() {
+      if (!macbookGroup || !ringsGroup) return;
+      const isMobile = window.innerWidth < 1024;
+      if (isMobile) {
+        macbookGroup.position.set(0, -1.05, -0.3);
+        macbookGroup.scale.setScalar(0.76);
+        ringsGroup.position.set(0, -1.05, -0.3);
+        ringsGroup.scale.setScalar(0.76);
+      } else {
+        macbookGroup.position.set(1.65, -0.55, 0.8);
+        macbookGroup.scale.setScalar(1.0);
+        ringsGroup.position.set(1.65, -0.55, 0.8);
+        ringsGroup.scale.setScalar(1.0);
+      }
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      adjustResponsiveModelPlacement();
+    }
+
+    function onPointerMove(e) {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = -(e.clientY / window.innerHeight) * 2 + 1;
+      state.mouseX = nx;
+      state.mouseY = ny;
+
+      if (state.isDragging) {
+        const dx = e.clientX - state.prevPointerX;
+        const dy = e.clientY - state.prevPointerY;
+        state.dragOffsetY += dx * 0.006;
+        state.dragOffsetX += dy * 0.004;
+        state.dragOffsetX = Math.max(-0.6, Math.min(0.6, state.dragOffsetX));
+        state.prevPointerX = e.clientX;
+        state.prevPointerY = e.clientY;
+      }
+    }
+
+    function onDragStart(e) {
+      state.isDragging = true;
+      state.prevPointerX = e.clientX;
+      state.prevPointerY = e.clientY;
+    }
+
+    function onTouchStart(e) {
+      if (e.touches.length === 1) {
+        state.isDragging = true;
+        state.prevPointerX = e.touches[0].clientX;
+        state.prevPointerY = e.touches[0].clientY;
+      }
+    }
+
+    function onTouchMove(e) {
+      if (state.isDragging && e.touches.length === 1) {
+        const dx = e.touches[0].clientX - state.prevPointerX;
+        const dy = e.touches[0].clientY - state.prevPointerY;
+        state.dragOffsetY += dx * 0.007;
+        state.dragOffsetX += dy * 0.005;
+        state.dragOffsetX = Math.max(-0.6, Math.min(0.6, state.dragOffsetX));
+        state.prevPointerX = e.touches[0].clientX;
+        state.prevPointerY = e.touches[0].clientY;
+      }
+    }
+
+    function onDragEnd() {
+      state.isDragging = false;
+    }
+
+    function onScrollUpdate() {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      state.scrollProgress = docHeight > 0 ? Math.min(1, Math.max(0, window.scrollY / docHeight)) : 0;
+    }
+
+    // =========================================================================
+    // 3. INTERACTIVE 3D SCENE CONTROL HANDLERS
+    // =========================================================================
+
+    document.getElementById('btn-toggle-orbit').addEventListener('click', () => {
+      state.autoOrbit = !state.autoOrbit;
+      document.getElementById('label-orbit').textContent = state.autoOrbit ? 'Orbit: ON' : 'Orbit: OFF';
+      showToast(state.autoOrbit ? 'Cosmic auto-orbit enabled' : 'Auto-orbit paused');
+    });
+
+    document.getElementById('btn-camera-focus').addEventListener('click', () => {
+      state.focusMacbook = !state.focusMacbook;
+      document.getElementById('label-focus').textContent = state.focusMacbook ? 'Deep Space' : 'MacBook HUD';
+      showToast(state.focusMacbook ? 'Camera locked onto MacBook Pro HUD' : 'Returned to cosmic wide view');
+    });
+
+    function toggleGalaxyBoost() {
+      state.galaxyBoost = !state.galaxyBoost;
+      document.getElementById('label-boost').textContent = state.galaxyBoost ? 'Warp: MAX' : 'Warp';
+      showToast(state.galaxyBoost ? 'Galaxy hyperdrive warp activated!' : 'Standard cosmic drift restored');
+    }
+    document.getElementById('btn-galaxy-boost').addEventListener('click', toggleGalaxyBoost);
+
+    function toggleWireframeMode() {
+      state.wireframe = !state.wireframe;
+      if (macbookGroup) {
+        macbookGroup.traverse(child => {
+          if (child.isMesh && child.material && !child.material.map) {
+            child.material.wireframe = state.wireframe;
+          }
+        });
+      }
+      showToast(state.wireframe ? 'Structural wireframe mesh ON' : 'Solid metallic shader ON');
+    }
+    document.getElementById('btn-wireframe').addEventListener('click', toggleWireframeMode);
+
+    function setCameraPreset(preset) {
+      if (preset === 'macbook') {
+        state.focusMacbook = true;
+        document.getElementById('label-focus').textContent = 'Wide Orbit';
+        showToast('Camera preset: MacBook Pro HUD Close-Up');
+      } else {
+        state.focusMacbook = false;
+        state.dragOffsetX = 0;
+        state.dragOffsetY = 0;
+        document.getElementById('label-focus').textContent = 'MacBook HUD';
+        showToast('Camera preset: Wide Cosmic Orbit');
+      }
+    }
+
+    function focusMacBookFromCard() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setCameraPreset('macbook');
+    }
+
+    // =========================================================================
+    // 4. MAIN ANIMATION LOOP (CALM, SLOW CINEMATIC ROTATION & WIDE CAMERA)
+    // =========================================================================
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const elapsed = clock.getElapsedTime();
+      // Calm default drift; Galaxy Warp still boosts speed when toggled
+      const speedMult = state.galaxyBoost ? 5.5 : 1.0;
+
+      // Update live JARVIS HUD screen texture
+      updateMacbookHudCanvas(elapsed);
+
+      // Slow, graceful rotation for Spiral Galaxy, Starfield & Planetary Rings
+      if (spiralGalaxyPoints) {
+        spiralGalaxyPoints.rotation.y += 0.00032 * speedMult;
+      }
+      if (starFieldOuter) {
+        starFieldOuter.rotation.y -= 0.00009 * speedMult;
+      }
+      if (ringsGroup) {
+        ringsGroup.rotation.z += 0.00075 * speedMult;
+      }
+
+      // Smooth Mouse Parallax + Drag Rotation
+      const parallaxY = state.mouseX * 0.22;
+      const parallaxX = -state.mouseY * 0.12;
+
+      // Gentle scroll-driven choreography & subtle floating bob for MacBook Pro
+      const scrollAngle = state.scrollProgress * Math.PI * 0.75;
+      const basePosX = window.innerWidth < 1024 ? 0 : 1.85 - Math.sin(state.scrollProgress * Math.PI) * 1.3;
+      const basePosY = (window.innerWidth < 1024 ? -1.05 : -0.5) + Math.sin(elapsed * 0.65) * 0.055;
+
+      if (macbookGroup) {
+        macbookGroup.position.x += (basePosX - macbookGroup.position.x) * 0.05;
+        macbookGroup.position.y += (basePosY - macbookGroup.position.y) * 0.05;
+
+        const autoSpin = state.autoOrbit ? Math.sin(elapsed * 0.2) * 0.14 : 0;
+        const targetMacY = -0.45 + autoSpin + scrollAngle + parallaxY + state.dragOffsetY;
+        const targetMacX = 0.14 + parallaxX + state.dragOffsetX;
+
+        macbookGroup.rotation.y += (targetMacY - macbookGroup.rotation.y) * 0.05;
+        macbookGroup.rotation.x += (targetMacX - macbookGroup.rotation.x) * 0.05;
+      }
+
+      if (ringsGroup && macbookGroup) {
+        ringsGroup.position.x = macbookGroup.position.x;
+        ringsGroup.position.y = macbookGroup.position.y;
+      }
+
+      // Zoomed-out Camera Position Interpolation (Wide Cosmic vs MacBook Close-Up)
+      let targetCamX = state.mouseX * 0.55;
+      let targetCamY = 1.15 + state.mouseY * 0.35;
+      let targetCamZ = 11.4 - state.scrollProgress * 1.8;
+
+      if (state.focusMacbook && macbookGroup) {
+        targetCamX = macbookGroup.position.x - 0.15;
+        targetCamY = macbookGroup.position.y + 0.85;
+        targetCamZ = 3.55;
+      }
+
+      camera.position.x += (targetCamX - camera.position.x) * 0.05;
+      camera.position.y += (targetCamY - camera.position.y) * 0.05;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.05;
+
+      if (state.focusMacbook && macbookGroup) {
+        camera.lookAt(macbookGroup.position.x, macbookGroup.position.y + 0.75, macbookGroup.position.z);
+      } else {
+        camera.lookAt(0, 0, 0);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // Start 3D Cosmic Engine on Window Load
+    window.onload = function () {
+      initThreeScene();
+      animate();
+    };
+  </script>
+</body>
+</html>
